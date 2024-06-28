@@ -61,7 +61,7 @@ autol_node_parameters = [
 ]
 
 urdf_name = 'test.urdf.xml'
-urdf_file = os.path.join(get_package_share_directory('autol_driver')+'/urdf',urdf_name)
+urdf_file = os.path.join(get_package_share_directory('autol_driver')+'/urdf', urdf_name)
 with open(urdf_file, 'r') as infp:
   robot_desc = infp.read()
 
@@ -80,19 +80,19 @@ def generate_launch_description():
     output='screen',
     parameters=autol_node_parameters,
     remappings=[
-    	('/autol_pointcloud_1', '/scan_cloud')
+      ('/autol_pointcloud_1', '/scan_cloud')
     ]
   )
 
   rtabmap_odom = Node(
-    package = 'rtabmap_odom',
-    executable = 'icp_odometry',
-    output = 'screen',
-    parameters = [{
-      'frame_id':'base_link',
-      'odom_frame_id':'odom',
-      'wait_for_transform':0.2,
-      'expected_update_rate':15.0,
+    package='rtabmap_odom',
+    executable='icp_odometry',
+    output='screen',
+    parameters=[{
+      'frame_id': 'base_link',
+      'odom_frame_id': 'odom',
+      'wait_for_transform': 0.2,
+      'expected_update_rate': 15.0,
     }],
     arguments=[
       'Icp/PointToPlane', 'false',
@@ -112,32 +112,35 @@ def generate_launch_description():
       'OdomF2M/BundleAdjustment', 'false',
       'Odom/GuessMotion', 'true',
       'Odom/ResetCountdown', '1',
-    ])
+    ]
+  )
     
   rtabmap_util = Node(
-    package = 'rtabmap_util',
-    executable = 'point_cloud_assembler',
-    output = 'screen',
-    parameters = [{
-      'max_cloud':10,
-      'fixed_frame_id':'odom',
+    package='rtabmap_util',
+    executable='point_cloud_assembler',
+    output='screen',
+    parameters=[{
+      'max_cloud': 10,
+      'fixed_frame_id': 'odom',
     }]
   )
   
   rtabmap_slam = Node(
-    package = 'rtabmap_slam',
-    executable = 'rtabmap',
-    output = 'screen',
-    parameters = [{
-      'frame_id':'base_link',
-      'subscribe_depth':False,
-      'subscribe_rgb':False,
-      'subscribe_scan':False,
-      'subscribe_scan_cloud':True,
-      'approx_sync':False,
-      'wait_for_transform':0.2,
+    package='rtabmap_slam',
+    executable='rtabmap',
+    output='screen',
+    parameters=[{
+      'frame_id': 'base_link',
+      'odom_frame_id': 'odom',
+      'map_frame_id': 'map',
+      'subscribe_depth': False,
+      'subscribe_rgb': False,
+      'subscribe_scan': False,
+      'subscribe_scan_cloud': True,
+      'approx_sync': False,
+      'wait_for_transform': 0.2,
     }],
-    arguments = [
+    arguments=[
       '-d',
       'RGBD/ProximityMaxGraphDepth', '0',
       'RGBD/ProximityPathMaxNeighbors', '1',
@@ -159,27 +162,28 @@ def generate_launch_description():
       'Icp/Strategy', '1',
       'Icp/OutlierRatio', '0.7',
       'Icp/CorrespondenceRatio', '0.2',
-    ])
+    ]
+  )
     
   rtabmap_viz = Node(
-    package = 'rtabmap_viz',
-    executable = 'rtabmap_viz',
-    output = 'screen',
-    parameters = [{
-      'frame_id':'base_link',
-      'odom_frame_id':'odom',
-      'subscribe_odom_info':True,
-      'subscribe_scan_cloud':True,
-      'approx_sync':False,
-      }],
+    package='rtabmap_viz',
+    executable='rtabmap_viz',
+    output='screen',
+    parameters=[{
+      'frame_id': 'base_link',
+      'odom_frame_id': 'odom',
+      'map_frame_id': 'map',
+      'subscribe_odom_info': True,
+      'subscribe_scan_cloud': True,
+      'approx_sync': False,
+    }],
   )
   
   robot_state_publisher = Node(
-    package = 'robot_state_publisher',
-    executable = 'robot_state_publisher',
-    parameters=[
-      {'robot_description': robot_desc}],
-    output = 'screen'
+    package='robot_state_publisher',
+    executable='robot_state_publisher',
+    parameters=[{'robot_description': robot_desc}],
+    output='screen'
   )
 
   return LaunchDescription([
