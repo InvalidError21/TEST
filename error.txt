@@ -1,0 +1,33 @@
+ICP odometry
+
+[WARN] [1719823789.655151813] [icp_odometry]: Odometry lost! Odometry will be reset after next 1 consecutive unsuccessful odometry updates...
+[WARN] [1719823789.668568977] [icp_odometry]: Odometry automatically reset to latest odometry pose available from TF (odom->base_link)!
+[INFO] [1719823789.668650004] [icp_odometry]: Odom: ratio=0.000000, std dev=0.000000m|0.000000rad, update time=0.013600s
+[INFO] [1719823789.705445004] [icp_odometry]: Odom: ratio=0.000000, std dev=99.995000m|99.995000rad, update time=0.000559s
+[INFO] [1719823790.272023608] [icp_odometry]: Odom: ratio=0.826923, std dev=0.011438m|0.003617rad, update time=0.132054s
+[WARN] [1719823790.736538007] [icp_odometry]: Odometry lost! Odometry will be reset after next 1 consecutive unsuccessful odometry updates...
+[WARN] [1719823790.737340801] [icp_odometry]: Odometry automatically reset to latest odometry pose available from TF (odom->base_link)!
+[INFO] [1719823790.738058499] [icp_odometry]: Odom: ratio=0.000000, std dev=0.000000m|0.000000rad, update time=0.001613s
+[WARN] [1719823791.702692474] [icp_odometry]: icp_odometry: Did not receive data since 5 seconds! Make sure the input topics are published ("$ rostopic hz my_topic") and the timestamps in their header are set. 
+
+
+rtabmap viz
+
+[WARN] [1719823652.151233456] [rtabmap_viz]: rtabmap_viz: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). If topics are not published at the same rate, you could increase "queue_size" parameter (current=10).
+rtabmap_viz subscribed to:
+   /scan_cloud
+[WARN] [1719823657.154653390] [rtabmap_viz]: rtabmap_viz: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). If topics are not published at the same rate, you could increase "queue_size" parameter (current=10).
+rtabmap_viz subscribed to:
+   /scan_cloud
+
+
+rtabmap slam
+
+[WARN] [1719823688.412401888] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). If topics are not published at the same rate, you could increase "queue_size" parameter (current=10).
+rtabmap subscribed to (approx sync):
+   /odom \
+   /scan_cloud
+[WARN] [1719823693.423493220] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). If topics are not published at the same rate, you could increase "queue_size" parameter (current=10).
+rtabmap subscribed to (approx sync):
+   /odom \
+   /scan_cloud
