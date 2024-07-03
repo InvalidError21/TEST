@@ -34,8 +34,6 @@ read_fast = 0
 repeat_delay = 0.0
 calibration = False
 
-rviz_config = get_package_share_directory('autol_driver') + '/rviz/pointcloud2_config.rviz'
-
 autol_node_parameters = [
   #Sensor Parameter
     {"manufacture_id": manufacture_id},
@@ -91,8 +89,10 @@ def generate_launch_description():
     parameters=[{
       'frame_id': 'base_link',
       'odom_frame_id': 'odom',
+      'publish_tf': True,
       'wait_for_transform': 0.2,
       'expected_update_rate': 15.0,
+      'publish_null_when_lost': False,
     }],
     arguments=[
       'Icp/PointToPlane', 'false',
@@ -114,16 +114,6 @@ def generate_launch_description():
       'Odom/ResetCountdown', '1',
     ]
   )
-    
-  rtabmap_util = Node(
-    package='rtabmap_util',
-    executable='point_cloud_assembler',
-    output='screen',
-    parameters=[{
-      'max_cloud': 10,
-      'fixed_frame_id': 'odom',
-    }]
-  )
   
   rtabmap_slam = Node(
     package='rtabmap_slam',
@@ -133,36 +123,39 @@ def generate_launch_description():
       'frame_id': 'base_link',
       'odom_frame_id': 'odom',
       'map_frame_id': 'map',
+      'publish_tf': True,
       'subscribe_depth': False,
       'subscribe_rgb': False,
       'subscribe_scan': False,
       'subscribe_scan_cloud': True,
-      'approx_sync': False,
+      'approx_sync': True,
       'wait_for_transform': 0.2,
-      'Mem/IncrementalMemory': True,  # Ensuring incremental memory for mapping
-      'RGBD/CreateOccupancyGrid': True,
-      'RGBD/ProximityMaxGraphDepth': 0,
-      'RGBD/ProximityPathMaxNeighbors': 1,
-      'RGBD/AngularUpdate': 0.05,
-      'RGBD/LinearUpdate': 0.05,
-      'Mem/NotLinkedNodesKept': False,
-      'Mem/STMSize': 30,
-      'Mem/LaserScanNormalK': 20,
-      'Reg/Strategy': 1,
-      'Icp/VoxelSize': 0.1,
-      'Icp/PointToPlaneK': 20,
-      'Icp/PointToPlaneRadius': 0,
-      'Icp/PointToPlane': True,
-      'Icp/Iterations': 10,
-      'Icp/Epsilon': 0.001,
-      'Icp/MaxTranslation': 3,
-      'Icp/MaxCorrespondenceDistance': 1,
-      'Icp/Strategy': 1,
-      'Icp/OutlierRatio': 0.7,
-      'Icp/CorrespondenceRatio': 0.2,
-    ],
-    remappings=[
-      ('/scan_cloud', '/rtabmap/scan_cloud')
+      'map_always_update': True,
+      }],
+    arguments=[
+      'Mem/IncrementalMemory', 'true',  # Ensuring incremental memory for mapping
+      'RGBD/CreateOccupancyGrid', 'true',
+      'RGBD/ProximityMaxGraphDepth', '0',
+      'RGBD/ProximityPathMaxNeighbors', '1',
+      'RGBD/AngularUpdate', '0.05',
+      'RGBD/LinearUpdate', '0.05',
+      'Mem/NotLinkedNodesKept', 'false',
+      'Mem/STMSize', '30',
+      'Mem/LaserScanNormalK', '20',
+      'Reg/Strategy', '1',
+      'Icp/VoxelSize', '0.1',
+      'Icp/PointToPlaneK', '20',
+      'Icp/PointToPlaneRadius', '0',
+      'Icp/PointToPlane', 'true',
+      'Icp/Iterations', '10',
+      'Icp/Epsilon', '0.001',
+      'Icp/MaxTranslation', '3',
+      'Icp/MaxCorrespondenceDistance', '1',
+      'Icp/Strategy', '1',
+      'Icp/OutlierRatio', '0.7',
+      'Icp/CorrespondenceRatio', '0.2',
+      'Grid/Sensor', '0',
+      'Kp/MaxFeatures', '-1',
     ]
   )
     
@@ -171,12 +164,10 @@ def generate_launch_description():
     executable='rtabmap_viz',
     output='screen',
     parameters=[{
+      'subscribe_scan_cloud': True,
       'frame_id': 'base_link',
       'odom_frame_id': 'odom',
-      'map_frame_id': 'map',
-      'subscribe_odom_info': True,
-      'subscribe_scan_cloud': True,
-      'approx_sync': False,
+      'approx_sync': True,
     }],
   )
   
@@ -190,7 +181,6 @@ def generate_launch_description():
   return LaunchDescription([
     autol_driver,
     rtabmap_odom,
-    rtabmap_util,
     rtabmap_slam,
     rtabmap_viz,
     robot_state_publisher
