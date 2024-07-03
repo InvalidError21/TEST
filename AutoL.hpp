@@ -204,4 +204,8 @@ inline void AutolDriver::SendPacket(const G32FrameData_t &fov_data_set, int32_t 
 
   for (int32_t iIdxI = 0; iIdxI < (int32_t)fov_data_set.size(); iIdxI++)
   {
-   
+    autol_driver::msg::AutolPacket lidar_packet;
+    memcpy(&lidar_packet.data[0], &fov_data_set[iIdxI], sizeof(AutoLG32UdpPacket));
+    lidar_frame.packets.emplace_back(lidar_packet);
+  }
+  pub_frame_[lidar_idx]->publish(l
