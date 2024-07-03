@@ -7,6 +7,7 @@
 #include "input/input_pcap.hpp"
 #include "packet_structure/g32_packet_structure.hpp"
 #include <sstream>
+#include <chrono>
 
 class AutolDriver : public rclcpp::Node
 {
@@ -199,84 +200,8 @@ void AutolDriver::Start()
 inline void AutolDriver::SendPacket(const G32FrameData_t &fov_data_set, int32_t lidar_idx)
 {
   autol_driver::msg::AutolFrame lidar_frame;
+  lidar_frame.header.stamp = node_.now();  // Add timestamp
+
   for (int32_t iIdxI = 0; iIdxI < (int32_t)fov_data_set.size(); iIdxI++)
   {
-    autol_driver::msg::AutolPacket lidar_packet;
-    memcpy(&lidar_packet.data[0], &fov_data_set[iIdxI], sizeof(AutoLG32UdpPacket));
-    lidar_frame.packets.emplace_back(lidar_packet);
-  }
-  pub_frame_[lidar_idx]->publish(lidar_frame);
-}
-
-inline void AutolDriver::SendPcdData(const G32PointData &point_cloud, int32_t lidar_idx)
-{
-  int32_t offset = 0;
-  int32_t fields = 6;
-  int32_t point_num_arr[MAX_NUM_LIDAR] = { 0 };
-
-  // step1. lidar update check
-  merge_pcd_data_[lidar_idx] = point_cloud;
-  for (int32_t iIdxI = 0; iIdxI < lidar_config_.lidar_count; iIdxI++)
-  {
-    if (merge_pcd_data_[iIdxI].size() == 0)
-    {
-      return;
-    }
-    point_num_arr[iIdxI] = merge_pcd_data_[iIdxI].size();
-  }
-
-  // step2. send lidar pcd data
-    for(int32_t iIdxI  = 0; iIdxI < lidar_config_.lidar_count; iIdxI++)
-    {
-      // RCLCPP_INFO(node_.get_logger(), "publish lidar idx: %d!!!!!!!!!!!!!", iIdxI);
-      // ros_msg_arr_[iIdxI].data.clear();
-      ros_msg_arr_[iIdxI].fields.clear();
-      ros_msg_arr_[iIdxI].fields.reserve(fields);
-      ros_msg_arr_[iIdxI].width = point_num_arr[iIdxI];
-      ros_msg_arr_[iIdxI].height = 1;
-      offset = addPointField(ros_msg_arr_[iIdxI], "x", 1, sensor_msgs::msg::PointField::FLOAT32, offset);
-      offset = addPointField(ros_msg_arr_[iIdxI], "y", 1, sensor_msgs::msg::PointField::FLOAT32, offset);
-      offset = addPointField(ros_msg_arr_[iIdxI], "z", 1, sensor_msgs::msg::PointField::FLOAT32, offset);
-      offset = addPointField(ros_msg_arr_[iIdxI], "intensity", 1, sensor_msgs::msg::PointField::FLOAT32, offset);
-      offset = addPointField(ros_msg_arr_[iIdxI], "ring", 1, sensor_msgs::msg::PointField::UINT16, offset);
-      offset = addPointField(ros_msg_arr_[iIdxI], "timestamp", 1, sensor_msgs::msg::PointField::FLOAT64, offset);
-      ros_msg_arr_[iIdxI].point_step = offset;
-      ros_msg_arr_[iIdxI].row_step = ros_msg_arr_[iIdxI].width * ros_msg_arr_[iIdxI].point_step;
-      ros_msg_arr_[iIdxI].is_dense = false;
-      ros_msg_arr_[iIdxI].data.resize(point_num_arr[iIdxI] * ros_msg_arr_[iIdxI].point_step);
-      sensor_msgs::PointCloud2Iterator<float> iter_x_(ros_msg_arr_[iIdxI], "x");
-      sensor_msgs::PointCloud2Iterator<float> iter_y_(ros_msg_arr_[iIdxI], "y");
-      sensor_msgs::PointCloud2Iterator<float> iter_z_(ros_msg_arr_[iIdxI], "z");
-      sensor_msgs::PointCloud2Iterator<float> iter_intensity_(ros_msg_arr_[iIdxI], "intensity");
-      sensor_msgs::PointCloud2Iterator<uint16_t> iter_ring_(ros_msg_arr_[iIdxI], "ring");
-      sensor_msgs::PointCloud2Iterator<double> iter_timestamp_(ros_msg_arr_[iIdxI], "timestamp");
-
-      for (int32_t iIdxJ = 0; iIdxJ < (int32_t)merge_pcd_data_[iIdxI].size(); iIdxJ++)
-      {
-        DataPoint point = merge_pcd_data_[iIdxI][iIdxJ];
-        *iter_x_ = point.x;
-        *iter_y_ = point.y;
-        *iter_z_ = point.z;
-        *iter_intensity_ = point.intensity;
-        *iter_ring_ = point.ring;
-        *iter_timestamp_ = point.timestamp;
-        ++iter_x_;
-        ++iter_y_;
-        ++iter_z_;
-        ++iter_intensity_;
-        ++iter_ring_;
-        ++iter_timestamp_;
-      }
-    }
-    
-    publish_mutex.lock();
-    for(int32_t iIdxI = 0; iIdxI < lidar_config_.lidar_count; iIdxI++)
-    {
-      merge_pcd_data_[iIdxI].clear();
-      ros_msg_arr_[iIdxI].header.frame_id = "autol_lidar";
-      RCLCPP_INFO(node_.get_logger(), "publish lidar idx: %d, pointcloud data: %d", iIdxI, ros_msg_arr_[iIdxI].width);
-      pub_pcd_[iIdxI]->publish(ros_msg_arr_[iIdxI]);
-    }
-    publish_mutex.unlock();
-}
-#endif
+   
