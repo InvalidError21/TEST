@@ -34,6 +34,8 @@ read_fast = 0
 repeat_delay = 0.0
 calibration = False
 
+rviz_config = get_package_share_directory('autol_driver') + '/rviz/pointcloud2_config.rviz'
+
 autol_node_parameters = [
   #Sensor Parameter
     {"manufacture_id": manufacture_id},
@@ -87,14 +89,13 @@ def generate_launch_description():
     executable='icp_odometry',
     output='screen',
     parameters=[{
-      'frame_id': 'base_link',
-      'odom_frame_id': 'odom',
       'publish_tf': True,
       'wait_for_transform': 0.2,
       'expected_update_rate': 15.0,
       'publish_null_when_lost': False,
     }],
     arguments=[
+      '-d',
       'Icp/PointToPlane', 'false',
       'Icp/Iterations', '10',
       'Icp/VoxelSize', '0.2',
@@ -120,9 +121,6 @@ def generate_launch_description():
     executable='rtabmap',
     output='screen',
     parameters=[{
-      'frame_id': 'base_link',
-      'odom_frame_id': 'odom',
-      'map_frame_id': 'map',
       'publish_tf': True,
       'subscribe_depth': False,
       'subscribe_rgb': False,
